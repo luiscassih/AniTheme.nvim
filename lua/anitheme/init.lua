@@ -2,53 +2,106 @@ local _local_1_ = require("anitheme.utils")
 local blend_hex = _local_1_["blend-hex"]
 if vim.g.colors_name then
   vim.cmd.hi("clear")
-else
 end
 vim.g["colors_name"] = "anitheme"
 vim.o["termguicolors"] = true
--- local base00 = "#161616"
+
+-- Base colors for blending
 local base00 = "#080808"
 local base06 = "#ffffff"
 local base09 = "#78a9ff"
-local anitheme = (((vim.o.background == "dark") and {
-  base00 = base00,
-  base01 = blend_hex(base00, base06, 0.085),
-  base02 = blend_hex(base00, base06, 0.18),
-  base03 = blend_hex(base00, base06, 0.3),
-  -- base04 = blend_hex(base00, base06, 0.82),
-  base04 = blend_hex(base00, base06, 0.90),
-  base05 = blend_hex(base00, base06, 0.95),
-  base06 = base06,
-  base07 = "#08bdba",
-  base08 = "#3ddbd9",
-  base09 = base09,
-  base10 = "#ee5396",
-  base11 = "#33b1ff",
-  base12 = "#ff7eb6",
-  base13 = "#42be65",
-  base14 = "#be95ff",
-  base15 = "#82cfff",
-  blend = "#131313",
-  none = "NONE"}) or {
-    base00 = base06,
-    base01 = blend_hex(base00, base06, 0.95),
-    base02 = blend_hex(base00, base06, 0.82),
-    base03 = base00,
-    base04 = "#37474F",
-    base05 = "#90A4AE",
-    base06 = "#525252",
-    base07 = "#08bdba",
-    base08 = "#ff7eb6",
-    base09 = "#ee5396",
-    base10 = "#FF6F00",
-    base11 = "#0f62fe",
-    base12 = "#673AB7",
-    base13 = "#42be65",
-    base14 = "#be95ff",
-    base15 = "#FFAB91",
-    blend = "#FAFAFA",
-    none = "NONE"})
-do end (vim.g)["terminal_color_0"] = anitheme.base01
+
+-- Color scheme definitions
+local color_schemes = {
+  ["default"] = {
+    dark = {
+      base00 = base00,
+      base01 = blend_hex(base00, base06, 0.085),
+      base02 = blend_hex(base00, base06, 0.18),
+      base03 = blend_hex(base00, base06, 0.3),
+      base04 = blend_hex(base00, base06, 0.90),
+      base05 = blend_hex(base00, base06, 0.95),
+      base06 = base06,
+      base07 = "#08bdba",
+      base08 = "#3ddbd9",
+      base09 = base09,
+      base10 = "#ee5396",
+      base11 = "#33b1ff",
+      base12 = "#ff7eb6",
+      base13 = "#42be65",
+      base14 = "#be95ff",
+      base15 = "#82cfff",
+      blend = "#131313",
+      none = "NONE"
+    },
+    light = {
+      base00 = base06,
+      base01 = blend_hex(base00, base06, 0.95),
+      base02 = blend_hex(base00, base06, 0.82),
+      base03 = base00,
+      base04 = "#37474F",
+      base05 = "#90A4AE",
+      base06 = "#525252",
+      base07 = "#08bdba",
+      base08 = "#ff7eb6",
+      base09 = "#ee5396",
+      base10 = "#FF6F00",
+      base11 = "#0f62fe",
+      base12 = "#673AB7",
+      base13 = "#42be65",
+      base14 = "#be95ff",
+      base15 = "#FFAB91",
+      blend = "#FAFAFA",
+      none = "NONE"
+    }
+  },
+  ["ariake"] = {
+    dark = {
+      base00 = "#080808", -- background (as set by user)
+      base01 = "#222530", -- line highlight / ui elements
+      base02 = "#2D303A", -- selection background / visual selection
+      base03 = "#313343", -- popup background / darker elements
+      base04 = "#B9BED5", -- variables / identifiers
+      base05 = "#B9BED5", -- default foreground
+      base06 = "#F8F8F0", -- bright foreground / cursor
+      base07 = "#9AEFEA", -- special elements / macros
+      base08 = "#7E7EDD", -- functions / method calls
+      base09 = "#7E7EDD", -- keywords / control flow
+      base10 = "#A571F4", -- numbers / values
+      base11 = "#7E7EDD", -- special methods / preprocessor
+      base12 = "#555C77", -- comments / documentation
+      base13 = "#A571F4", -- types / class names
+      base14 = "#9AEFEA", -- strings / content
+      base15 = "#B9BED5", -- delimiters / punctuation
+      blend = "#222530",  -- blend color for UI
+      none = "NONE"
+    }
+  }
+}
+
+-- Get the current color scheme based on background
+local function get_current_colors()
+  local scheme_name = vim.g.anitheme_colorscheme or "default"
+  vim.notify("Using color scheme '" .. scheme_name .. "'")
+  local background = vim.o.background or "dark"
+  local scheme = color_schemes[scheme_name]
+  
+  if not scheme then
+    vim.notify("Color scheme '" .. scheme_name .. "' not found, falling back to default", vim.log.levels.WARN)
+    scheme = color_schemes["default"]
+  end
+  
+  if background == "light" and not scheme.light then
+    vim.notify("Light variant for '" .. scheme_name .. "' not available, using dark variant", vim.log.levels.WARN)
+    return scheme.dark
+  end
+  
+  return scheme[background]
+end
+
+local anitheme = get_current_colors()
+
+vim.g["terminal_color_0"] = anitheme.base01
 vim.g["terminal_color_1"] = anitheme.base11
 vim.g["terminal_color_2"] = anitheme.base14
 vim.g["terminal_color_3"] = anitheme.base13
